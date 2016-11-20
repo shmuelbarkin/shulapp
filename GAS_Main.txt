@@ -1,0 +1,31 @@
+var
+  SHEETNAME_MEMBERS = 'Members',
+  
+  DATEFORMAT_RECEIPT = 'MM/d/yyyy',    
+  DAYS_TO_MILLISECONDS = 86400000,
+  
+  URL_PAYMENT_SITE = 'https://secure.cardknox.com/whitestreetshul/?g=1&xBillLastName=%s&xBillStreet=%s&xBillZip=%s&xDescription=%s&xAmount=%s';
+
+
+function onOpen()
+{
+  var ui = SpreadsheetApp.getUi();
+  
+  ui.createMenu('Utilities')
+    .addSubMenu(ui.createMenu('Pledges')
+      .addItem('Process Bills', 'processBills')
+      .addItem('Process Receipts', 'processReceipts')      
+    )
+    .addSubMenu(ui.createMenu('Membership')
+      .addItem('Process Increment Date and Decrement Numleft', 'incrementDateAndDecrementNumLeft')
+      .addItem('Process Membership Messages', 'sendMembershipReminders')
+      .addItem('Process Signup Campaign', 'sendSignUpCampaign')
+    )
+    .addSubMenu(ui.createMenu('Simcha')
+      .addItem('Process Invitation Message', 'sendSimchaInvitations')
+      .addItem('Process Second Reminder A', 'sendSimchaReminder2_A')
+      .addItem('Process Second Reminder B', 'sendSimchaReminder2_B')
+      .addItem('Process Second Reminder C', 'sendSimchaReminder2_C')
+    )
+  .addToUi();
+} // onOpen()
