@@ -1,10 +1,10 @@
-var  
+var
   TWILIO_ACCOUNT_SID = '',
-  TWILIO_AUTH_TOKEN  = ',
+  TWILIO_AUTH_TOKEN  = '',
   URL_TWILIO_SEND_SMS = 'https://api.twilio.com/2010-04-01/Accounts/' +  TWILIO_ACCOUNT_SID + '/Messages.json',
   TWILIO_FROM = '';
-  
-  
+
+
 function sendSMS_(numberRecipient, message)
 {
   try
