@@ -60,8 +60,13 @@ function main() {
                 }
             }
 
-            var sentFolder = DriveApp.getFolderById(setting.sentFolderId);  //get the sent folder
-
+            var sentFolder;
+            try{
+                sentFolder = DriveApp.getFolderById(setting.sentFolderId);  //get the sent folder
+            }
+            catch(e){
+                sentFolder = null; //throws a scripting exception if the folder does not exist or the user does not have permission to access it
+            }
             if (!isNullOrEmpty(currentRowData.attachment)) //if an attachment was sent
             {
                 moveFile(currentRowData.attachment, sentFolder);   //move the attachment file to the sent folder
@@ -269,14 +274,17 @@ function getGoogleDocumentAsHTML(id)//get google doc id and return html content
 }
 
 function moveFile(fileId, targetFolder) {
-    var file = DriveApp.getFileById(fileId);//get the file
-    var fileParents = file.getParents();//get the file Parents
-    if (fileParents.hasNext())//if there is a sourceFolder
+    if(targetFolder != null)//if the targetFolder if valid
     {
-        var sourceFolder = fileParents.next();//get the file source folder
-        sourceFolder.removeFile(file);//remove the file from its original folder
+        var file = DriveApp.getFileById(fileId);//get the file
+        var fileParents = file.getParents();//get the file Parents
+        if (fileParents.hasNext())//if there is a sourceFolder
+        {
+            var sourceFolder = fileParents.next();//get the file source folder
+            sourceFolder.removeFile(file);//remove the file from its original folder
+        }
+        targetFolder.addFile(file);//add the attachment file to the sent folder
     }
-    targetFolder.addFile(file);//add the attachment file to the sent folder
 }
 
 function replaceTags(tags, text)//get tags array and text and return the the replaced text
