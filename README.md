@@ -17,5 +17,10 @@ Features of this sheet:
 
 Scripts for this sheet are the `Messaging` directory
 
-## More info
-For more information on this project please see http://managemyshul.com/
+## Usage
+The simplest way to use these scripts is to make a copy of the Google sheets that have the scripts already added to them.
+Head over to https://managemyshul.com/ for links to the sheets, more info and setup instructions. 
+
+## Credits
+- Accounting app - scripts written by: [Allan Ostrea](https://github.com/eyahlin)
+- Messaging app - scripts written by: [Avigail Buxenbaum](https://github.com/AvigailBuxenbaum)
