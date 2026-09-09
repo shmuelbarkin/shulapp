@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Manage My Shul — free tools for running a shul</title>
+<meta name="description" content="An archive of free spreadsheets, scripts and templates for shul management: zmanim charts, a member database, pledges and receipts, aliya cards. Superseded by ShulBase.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="canonical" href="https://managemyshul.com/">
+<!--STYLE-->
+<style>
+/* Manage My Shul — an archive.
+   Printed hard and monochrome: true black on white, no accent colour, rules
+   with weight to them. Links earn their emphasis from weight and underline
+   rather than hue. Monospace is reserved for things that are literally
+   spreadsheet content. */
+
+/* Tell the browser both themes are supported so it paints the correct base
+   colour between navigations instead of flashing white. */
+:root {
+  color-scheme: light dark;
+  --paper: #ffffff;
+  --ink: #000000;
+  --muted: #454545;
+  --rule: #000000;
+  --rule-soft: #c9c9c9;
+  --wash: #eeeeee;
+  --notice-bg: #000000;
+  --notice-fg: #ffffff;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --measure: 48rem;
+  --rail: 11rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0a0a0a;
+    --ink: #ffffff;
+    --muted: #adadad;
+    --rule: #ffffff;
+    --rule-soft: #3c3c3c;
+    --wash: #1b1b1b;
+    /* the notice is persistent and sticky, so it sits just off the page rather
+       than as a bright slab that would glare on every scroll */
+    --notice-bg: #161616;
+    --notice-fg: #ffffff;
+  }
+}
+
+/* Set pre-paint by the inline head script, so a dismissed notice never flashes. */
+.notice-dismissed .notice { display: none; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Paint the canvas from the root, so there is no white frame between
+     documents before body styles apply. */
+  background: var(--paper);
+  /* Reserve the scrollbar always: without this, moving between a page that
+     scrolls and one that does not shifts the centred column sideways. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.0625rem/1.6 var(--serif);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ---------- Archive notice ---------- */
+
+.notice {
+  background: var(--notice-bg);
+  color: var(--notice-fg);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.notice[hidden] { display: none; }
+
+.notice__inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.notice p { margin: 0; flex: 1; }
+
+.notice a { color: inherit; font-weight: 700; text-underline-offset: 0.18em; }
+
+.notice__close {
+  flex: none;
+  align-self: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 0.2rem 0.35rem;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.notice__close:hover { opacity: 1; }
+
+.notice__close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* ---------- Frame ---------- */
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* The notice and the menu pin together as one unit: these pages are long
+   documentation, and both the way back to the other sheets and the fact that
+   this is an archive should stay in view. Grouping them means they cannot
+   drift apart or overlap when the notice wraps onto two lines. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--paper);
+}
+
+.nav {
+  background: var(--paper);
+  border-bottom: 2px solid var(--rule);
+}
+
+.nav__inner {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.15rem;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 2px solid transparent;
+}
+
+.nav a:hover { color: var(--ink); }
+
+.nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 700;
+  border-bottom-color: var(--ink);
+}
+
+.nav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Anchored sections must clear the sticky menu. */
+[id] { scroll-margin-top: 6.5rem; }
+
+.masthead { padding: 2.5rem 0 0; }
+
+.masthead__title {
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1;
+}
+
+.masthead__title a { color: inherit; text-decoration: none; }
+
+.masthead__title a:hover { text-decoration: underline; text-underline-offset: 0.14em; }
+
+.masthead__tagline {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* ---------- Successor ---------- */
+
+/* A ruled box rather than a solid fill: it still has to be the loudest thing
+   on the page, but a slab of black that size swamped everything under it. */
+.successor {
+  margin: 2.25rem 0 0;
+  padding: 1.7rem 1.6rem 1.8rem;
+  border: 3px solid var(--ink);
+}
+
+.successor__lead {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.15;
+}
+
+.successor__body { margin: 1rem 0 0; }
+
+.successor p + p { margin-top: 0.85rem; }
+
+.cta {
+  display: inline-block;
+  margin-top: 1.4rem;
+  padding: 0.7rem 1.35rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cta:hover { text-decoration: underline; text-underline-offset: 0.22em; }
+
+.cta:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+/* ---------- Prose ---------- */
+
+main { padding-bottom: 1rem; }
+
+.page-title {
+  margin: 2.5rem 0 0.4rem;
+  font-size: 2.15rem;
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  line-height: 1.1;
+}
+
+.page-intro { margin: 0; max-width: 36rem; color: var(--muted); font-size: 1.05rem; }
+
+/* Sections hang their heading in a left rail and rule off from the one above.
+   A stack of headings with rules underneath reads as a README; a spine and a
+   heavy separator reads as a document. */
+section {
+  display: grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: 0 2.25rem;
+  align-items: start;
+}
+
+section > * { grid-column: 2; min-width: 0; }
+
+.lede { max-width: 37rem; }
+
+section {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 3px solid var(--rule);
+}
+
+section > h2 {
+  grid-column: 1;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+section > *:first-of-type { margin-top: 0; }
+
+.section-note { margin: 0 0 0.9rem; color: var(--muted); }
+
+.signature { margin-top: 1.4rem; }
+
+/* Subsection heads sit in the wide column, so they must stay quieter than the
+   section head in the rail or the hierarchy reads backwards. */
+h3 {
+  margin: 1.7rem 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.002em;
+}
+
+p { margin: 0.8rem 0; }
+
+ul, ol { margin: 0.85rem 0; padding-left: 1.5rem; }
+
+li { margin: 0.32rem 0; padding-left: 0.15rem; }
+
+li::marker { color: var(--ink); font-weight: 700; }
+
+ol > li::marker { font-family: var(--mono); font-size: 0.8em; }
+
+li > ul, li > ol { margin: 0.32rem 0; }
+
+/* No accent colour, so a link is marked by weight and a rule under it. */
+a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.15em;
+}
+
+a:hover { text-decoration-thickness: 3px; }
+
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+strong { font-weight: 700; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--wash);
+  padding: 0.12em 0.32em;
+  overflow-wrap: break-word;
+}
+
+.needs {
+  margin: 0.85rem 0;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+}
+
+.needs strong { color: var(--ink); font-weight: 700; }
+
+.callout {
+  margin: 1.15rem 0;
+  padding: 0.85rem 1.1rem;
+  background: var(--wash);
+  border-left: 4px solid var(--ink);
+  font-size: 0.95rem;
+}
+
+.callout p { margin: 0; }
+
+/* ---------- Foot ---------- */
+
+.foot {
+  margin-top: 3rem;
+  padding: 1.6rem 0 5.5rem;
+  border-top: 2px solid var(--rule);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.foot p { margin: 0.35rem 0; }
+
+.foot strong { color: var(--ink); }
+
+/* Below the rail's working width the spine collapses and headings sit inline. */
+@media (max-width: 46rem) {
+  section { display: block; }
+  section > h2 { margin-bottom: 0.8rem; font-size: 1.25rem; }
+}
+
+@media (max-width: 34rem) {
+  .masthead__title { font-size: 2.05rem; }
+  .page-title { font-size: 1.8rem; }
+  .successor { padding: 1.4rem 1.25rem 1.5rem; }
+  .successor__lead { font-size: 1.35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+<!--/STYLE-->
+<script>
+/* Runs before first paint: if the notice was dismissed, hide it now rather than
+   letting it paint and then vanish when banner.js runs at end of body. */
+try { if (localStorage.getItem('mms-notice-dismissed') === '1') document.documentElement.classList.add('notice-dismissed'); } catch (e) {}
+</script>
+</head>
+<body>
+
+<div class="topbar">
+
+  <div class="notice">
+    <div class="notice__inner">
+      <p>These tools are archived and no longer maintained. Their successor is <a href="https://shulbase.com">ShulBase</a>.</p>
+      <button type="button" class="notice__close" aria-label="Dismiss this notice">&times;</button>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Sections">
+    <div class="wrap nav__inner">
+        <a href="/" aria-current="page">Home</a>
+        <a href="/zmanim/">Zmanim</a>
+        <a href="/pledges-receipts/">Pledges &amp; Receipts</a>
+        <a href="/member-database/">Member Database</a>
+        <a href="/technologies/">Technologies</a>
+        <a href="/terms/">Terms</a>
+    </div>
+  </nav>
+
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="masthead__title"><a href="/">Manage My Shul</a></p>
+    <p class="masthead__tagline">There is a better way</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <main>
+
+    <aside class="successor">
+      <p class="successor__lead">These tools have a successor: ShulBase.</p>
+      <p class="successor__body">Everything on this page began as spreadsheets and scripts held together by hand. It is now built properly &mdash; members and households, the luach and zmanim, messaging by email and SMS, pledges, billing and receipts &mdash; as one application instead of a folder of files to copy and customize.</p>
+      <p>The material below stays online as an archive. It still works, and you are welcome to it, but ShulBase is where the work continues.</p>
+      <a class="cta" href="https://shulbase.com">Visit shulbase.com</a>
+    </aside>
+
+    <h1 class="page-title">Free tools for running a shul</h1>
+
+    <div class="lede">
+      <p>Shul management has a lot of moving parts; that&rsquo;s a lot of time too. Thankfully, a better way is coming to town.</p>
+
+      <p>Below you will find various tools that we have developed for ourselves and are now releasing to the public. Many of these items will require customization for your Shul; our goal is to present ideas, and by providing all of our source files you have a head start to your own great set of tools. If there is something you would like to see here but we have not posted it, please let us know. Likewise, if you have a great tool or resource that you would like to post, please let us know. We have also included various tools we have come across that can be helpful.</p>
+
+      <p>Please note, this is a work in progress; we hope to continuously update and your feedback will add a great deal to making this project more meaningful to more people.</p>
+
+      <p>For questions, comments or more information feel free to reach out.</p>
+
+      <p class="signature"><strong>Shmuel Barkin</strong><br>
+      <a href="mailto:sb@sbarkin.com">sb@sbarkin.com</a></p>
+    </div>
+
+    <section>
+      <h2>What&rsquo;s currently in the box?</h2>
+
+      <h3>Efficiency and Automation Tools</h3>
+      <ul>
+        <li><a href="#zmanim-charts">Zmanim Charts</a></li>
+        <li><a href="#member-database">Member Database</a></li>
+        <li><a href="#billing">Billing and Receipts Automation</a></li>
+        <li><a href="#accounting">Accounting and Reporting</a></li>
+        <li><a href="#membership">Membership Management</a></li>
+        <li><a href="#simcha">Simcha Announcements</a></li>
+      </ul>
+
+      <h3>Templates, Resources and Tips</h3>
+      <ul>
+        <li><a href="#aliya-cards">Aliya Cards</a></li>
+        <li><a href="#free-software">Free Software</a></li>
+        <li><a href="#group-emails">Group Emails</a></li>
+      </ul>
+    </section>
+
+    <section id="introduction">
+      <h2>Introduction</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> a browser</p>
+      <ul>
+        <li><strong>Files:</strong> All source files are shared via a <a href="https://drive.google.com/drive/folders/0B730oTiD1CwlaHNId3h0MUgtYnM?resourcekey=0-T4A4NZOghUlG3ChqeE9QyA">Google Drive folder</a>; feel free to download whatever you would like.</li>
+        <li><strong>Fonts:</strong> To get the exact look of some files will require the fonts we have used. Fonts that are in the public domain <a href="https://drive.google.com/drive/folders/0B730oTiD1CwlemNIcTdWQzZvODA?resourcekey=0-1mGL2jXymxDI5QX2P9GiQA&amp;usp=sharing">have been uploaded here</a>. For other fonts, please substitute with what you have. (This is only relevant for the Excel files; we recommend the Google Sheets version.)</li>
+        <li><strong>Scripts:</strong> All scripts for the project can be found on GitHub. <a href="https://github.com/shmuelbarkin/shulapp">Open the project in GitHub</a>.</li>
+        <li><strong>Screenshots:</strong> We include screenshots to illustrate how to set up and use these files. In an effort to keep these pages clean, when a screenshot is necessary it is included as a link. Click on the link and the screenshot will open in another tab in your browser.</li>
+      </ul>
+    </section>
+
+    <section id="zmanim-charts">
+      <h2>Zmanim Charts</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, <em>or</em> Microsoft Excel</p>
+      <p>Creating Zmanim charts is a big job, but using a Google Sheet or an Excel spreadsheet can greatly reduce the time and increase accuracy. We have shared the spreadsheet we use for our Shul.</p>
+      <ul>
+        <li>Google Sheets (newer and maintained) &mdash; <a href="https://docs.google.com/spreadsheets/d/1lzookxePSuM-0y3Kfmwdm11OPNKtU27skUw-RIzPMuI">access the file</a>.
+          <ul>
+            <li>Please note that this sheet uses some custom &ldquo;<a href="https://support.google.com/docs/answer/12504534">Named functions</a>&rdquo;.</li>
+          </ul>
+        </li>
+        <li>Excel (older and deprecated) &mdash; <a href="https://drive.google.com/drive/folders/0B730oTiD1CwlVUJOd3VWTW02ZTQ?resourcekey=0-zhtgjpXfC4uH0fLAIVjtiQ&amp;usp=sharing">access the files</a>.</li>
+      </ul>
+      <p><strong>Features:</strong></p>
+      <ul>
+        <li>Automatically calculate Zmanim based on Shkiah</li>
+        <li>Prepare Shabbos Zmanim for the whole year in 20 minutes</li>
+        <li>When printing a chart for Shabbos simply choose the Shabbos from a drop-down list</li>
+        <li>Keep an organized list of all Zmanim sheets in one file</li>
+      </ul>
+      <p><a href="/zmanim/">Full setup instructions</a></p>
+    </section>
+
+    <section id="aliya-cards">
+      <h2>Aliya Cards</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Adobe InDesign, Microsoft Excel or Notepad</p>
+      <p>Before we can bill for pledges we need to know who owes what. To record on Shabbos or Yom Tov what members pledged for a kibud, many Shuls use cards with numbers and paperclips. We have our version available here &mdash; <a href="https://drive.google.com/drive/folders/0B730oTiD1Cwlb21NYllTbkt3MGs?resourcekey=0-NNbdZ1kqDUKFhGV1flMihA&amp;usp=sharing">access the files</a>.</p>
+      <p><strong>Files:</strong> It consists of an InDesign file which is the template for the design, and we use a data merge to pull in all available kibudim and generate a PDF with all the cards.</p>
+      <ul>
+        <li><strong>Aliya Cards</strong> &mdash; a template which creates a card for each Aliya or Kibud. Use this to mark what an Aliya was sold for.</li>
+        <li><strong>Member Cards</strong> &mdash; a template which creates a card for each member; it is used to record what a member owes and is attached to the Aliya card.</li>
+      </ul>
+      <p>There is some repetitiveness between the above card types, and different Gabboim have different styles on how to use them.</p>
+      <p><strong>Other:</strong> An additional feature we have built in is the ability to print on the card all the names a member usually uses in a Mi Shebeirach; this facilitates the Mi Shebeirach process and saves time for the Tzibur.</p>
+    </section>
+
+    <section id="member-database">
+      <h2>Member Database</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, basic SQL (<a href="https://developers.google.com/chart/interactive/docs/querylanguage">Google version, of course</a>)</p>
+      <p>This is the cornerstone for most of the items on this site. While keeping an organized list of all members and information relevant to them is quite basic, we introduce a way to manage that data. The best way to illustrate this is with a before and after.</p>
+      <p><strong>Before:</strong></p>
+      <ul>
+        <li>Multiple lists need to be managed, e.g. Contact Information, Gabbai List, List for Aliya Cards (see above), Membership Drive, etc. While there is some overlap, each list has either unique fields or a specific layout.</li>
+        <li>The same data was often on more than one list; corrections needed to be made across all relevant lists.</li>
+      </ul>
+      <p><strong>After:</strong></p>
+      <ul>
+        <li>Only one master list contains all relevant information.</li>
+        <li>That list is used to generate any other list needed in any format.</li>
+        <li>E.g. if a name is added to the &ldquo;Name for Aliyah&rdquo; cell for a member, the Gabbai list gets updated with that name, as does the list for Aliya cards.</li>
+      </ul>
+      <p><a href="/member-database/">Full setup instructions</a></p>
+    </section>
+
+    <section id="billing">
+      <h2>Billing and Receipts Automation</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, G Suite Scripts (setup only)</p>
+      <p>Automate your billing and receipts.</p>
+      <ul>
+        <li>Enter the line items of what each member pledged</li>
+        <li>The system will send out the bills for you</li>
+        <li>Once paid, mark as paid and the system will send out the receipts</li>
+        <li>Bills and receipts can be sent via email or SMS</li>
+        <li>Follow-up &mdash; the system will send a follow-up message every 30 days for unpaid bills</li>
+        <li>If you have a payment site to accept credit cards, the email will contain a button with a link to the site and it will fill in the form for the member; all they need to do is enter their credit card information</li>
+      </ul>
+      <p><a href="/pledges-receipts/">Full setup instructions</a></p>
+    </section>
+
+    <section id="accounting">
+      <h2>Accounting and Reporting</h2>
+      <ul>
+        <li>Once a receipt is sent out the transaction gets recorded in the system for future reference and reporting purposes.</li>
+      </ul>
+    </section>
+
+    <section id="membership">
+      <h2>Membership Management</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, G Suite Scripts (setup only)</p>
+      <p>Automate your membership sign-up and reminders.</p>
+      <ul>
+        <li>Send out monthly receipts automatically</li>
+        <li>The system will send email reminders to members whose membership is expiring or their credit card is expiring</li>
+        <li>Send out emails occasionally to regulars who do not pay membership to solicit membership</li>
+        <li>If you have a payment site to accept credit cards, the email will contain a button with a link to the site and it will fill in the form for the member; all they need to do is enter their credit card information</li>
+      </ul>
+    </section>
+
+    <section id="simcha">
+      <h2>Simcha Announcements</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, G Suite Scripts (setup only)</p>
+      <p>Automated messages about upcoming Simchas or events.</p>
+      <ul>
+        <li>Send out email or SMS messages to inform members about an upcoming Simcha or event</li>
+        <li>Simply enter the name, event type, place and time into a spreadsheet</li>
+        <li>Using pre-built logic the system will send out the appropriate messages at the appropriate times</li>
+      </ul>
+      <p class="callout">Full documentation for this tool was never written. The scripts are in the <a href="https://github.com/shmuelbarkin/shulapp">GitHub repository</a> under <code>scripts/Accounting</code>.</p>
+    </section>
+
+    <section id="messaging">
+      <h2>Messaging</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> Google Sheets, G Suite Scripts (setup only)</p>
+      <p>Group messaging via email or SMS.</p>
+      <ul>
+        <li>Send out email or SMS messages to shul members</li>
+        <li>You can create multiple lists from the same contacts</li>
+        <li>Supports adding an attachment</li>
+        <li>Schedule messages to go out on a specific date or time</li>
+      </ul>
+      <p class="callout">Full documentation for this tool was never written. The scripts are in the <a href="https://github.com/shmuelbarkin/shulapp">GitHub repository</a> under <code>scripts/Messaging</code>.</p>
+    </section>
+
+    <section id="free-software">
+      <h2>Free Software</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> a browser</p>
+      <p>If you have a 501(c)(3) you can get many great software titles or services for free or at a greatly discounted price. Sign up at <a href="https://www.techsoup.org/">techsoup.org</a>.</p>
+      <p>Sample offers:</p>
+      <ul>
+        <li>G Suite (formerly Google Apps) &mdash; free</li>
+        <li>Office 365 (Microsoft) &mdash; free and greatly discounted options</li>
+        <li>Microsoft Office &mdash; greatly discounted</li>
+        <li>Adobe Creative Cloud &mdash; discounted</li>
+        <li>QuickBooks &mdash; discounted</li>
+      </ul>
+    </section>
+
+    <section id="group-emails">
+      <h2>Group Emails</h2>
+      <p class="needs"><strong>Programs/skills needed:</strong> G Suite (Google) or Office 365 (Microsoft)</p>
+      <p>Sending out group emails to Shul members is something most of us do and is fairly simple.</p>
+      <p><strong>Use the <a href="#messaging">Messaging</a> app above.</strong></p>
+      <p><strong>Copying all members:</strong> This is typically done by copying everyone on the email. If you use this method, the best practice is to use the bcc line in order to not share all email addresses with all recipients.</p>
+      <p><strong>Groups:</strong> If you have G Suite or Office 365 then a better way to handle this is using groups. Below is a suggested way of handling this with groups. When sending an email you choose the email address for that group and an email is sent to the entire distribution list.</p>
+      <ul>
+        <li><strong>Members group</strong> &mdash; <code>members@yourshul.com</code>. This group includes all members excluding the Rov. Why? Because every once in a while we send out an email that specifically excludes the Rov, e.g. we are collecting money to give the Rov a gift.</li>
+        <li><strong>Shul announcements</strong> &mdash; <code>shul@yourshul.com</code>. This group is used for all announcements. This group has only two members: the members group and the Rov.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <p><strong>Manage My Shul</strong> &mdash; an archive. These tools are no longer maintained; their successor is <a href="https://shulbase.com">ShulBase</a>.</p>
+    <p>Free to use and adapt &mdash; see <a href="/terms/">Terms</a>. Source files on <a href="https://github.com/shmuelbarkin/shulapp">GitHub</a>. Contact <a href="mailto:sb@sbarkin.com">sb@sbarkin.com</a>.</p>
+  </footer>
+
+</div>
+
+<!--SCRIPT-->
+<script>
+(function () {
+  var KEY = 'mms-notice-dismissed';
+  var notice = document.querySelector('.notice');
+  if (!notice) return;
+
+  try {
+    if (localStorage.getItem(KEY) === '1') notice.hidden = true;
+  } catch (e) {
+    /* storage unavailable (private mode, blocked cookies) - leave it visible */
+  }
+
+  var close = notice.querySelector('.notice__close');
+  if (!close) return;
+
+  close.addEventListener('click', function () {
+    notice.hidden = true;
+    try {
+      localStorage.setItem(KEY, '1');
+    } catch (e) {
+      /* nothing to persist to; it returns on the next page load */
+    }
+  });
+})();
+
+/* Same-origin navigation without a document swap.
+ *
+ * Every click used to be a full document load: the browser tore down the page
+ * and rebuilt it, chrome and all, which is what read as a flicker. The notice,
+ * masthead, sticky menu and footer are identical on every page and live outside
+ * <main>, so only <main> has to change. Nothing else repaints.
+ *
+ * Progressive enhancement throughout: if anything here fails or is unsupported,
+ * the link is left alone and the browser navigates normally. */
+(function () {
+  if (!window.fetch || !window.history || !history.pushState || !window.DOMParser) return;
+
+  var main = document.querySelector('main');
+  var nav = document.querySelector('.nav');
+  if (!main) return;
+
+  var cache = new Map();
+  var LIMIT = 12;
+
+  /* Which document is currently rendered, ignoring the fragment. Chrome fires
+     popstate for same-document fragment navigation as well as for real history
+     traversal, so without this the handler would re-render <main> and reset the
+     scroll every time someone clicked an in-page anchor. */
+  var current = location.pathname + location.search;
+
+  function internal(a) {
+    if (!a || !a.href || a.hasAttribute('download')) return null;
+    if (a.target && a.target !== '_self') return null;
+    var u;
+    try { u = new URL(a.href, location.href); } catch (e) { return null; }
+    if (u.origin !== location.origin) return null;
+    // leave assets and anything that is not a page to the browser
+    var last = u.pathname.split('/').pop();
+    if (last && last.indexOf('.') !== -1 && !/\.html?$/i.test(last)) return null;
+    return u;
+  }
+
+  function fetchPage(url) {
+    if (cache.has(url)) return cache.get(url);
+    var p = fetch(url, { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    });
+    if (cache.size > LIMIT) cache.clear();
+    cache.set(url, p);
+    return p;
+  }
+
+  function markCurrent(pathname) {
+    if (!nav) return;
+    var links = nav.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var u = internal(links[i]);
+      if (u && u.pathname === pathname) links[i].setAttribute('aria-current', 'page');
+      else links[i].removeAttribute('aria-current');
+    }
+  }
+
+  function render(html, url, scroll) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var fresh = doc.querySelector('main');
+    if (!fresh) { location.href = url; return; }
+
+    main.replaceWith(fresh);
+    main = fresh;
+    if (doc.title) document.title = doc.title;
+
+    var canonical = document.querySelector('link[rel=canonical]');
+    var freshCanonical = doc.querySelector('link[rel=canonical]');
+    if (canonical && freshCanonical) canonical.href = freshCanonical.href;
+
+    var target = new URL(url, location.href);
+    current = target.pathname + target.search;
+    markCurrent(target.pathname);
+    window.scrollTo(0, scroll || 0);
+
+    /* Move focus into the new content so keyboard and screen reader users are
+       not left on a link that no longer exists. */
+    main.setAttribute('tabindex', '-1');
+    main.focus({ preventScroll: true });
+  }
+
+  function go(url, push) {
+    fetchPage(url).then(function (html) {
+      if (push) {
+        history.replaceState({ y: window.scrollY }, '');
+        history.pushState({ y: 0 }, '', url);
+      }
+      render(html, url, 0);
+    })['catch'](function () { location.href = url; });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    var u = internal(a);
+    if (!u) return;
+    // in-page anchors stay with the browser
+    if (u.pathname === location.pathname && u.hash) return;
+    if (u.href === location.href) { e.preventDefault(); return; }
+    e.preventDefault();
+    go(u.href, true);
+  });
+
+  document.addEventListener('mouseover', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    var u = internal(a);
+    if (u && u.href !== location.href) fetchPage(u.href)['catch'](function () {});
+  });
+
+  window.addEventListener('popstate', function (e) {
+    // a fragment change on the page already shown: let the browser scroll
+    if (location.pathname + location.search === current) return;
+    var y = (e.state && e.state.y) || 0;
+    fetchPage(location.href).then(function (html) {
+      render(html, location.href, y);
+    })['catch'](function () { location.reload(); });
+  });
+
+  /* Warm the menu once the page is idle: six documents of about 20KB, so the
+     first click on any of them is already in memory. */
+  var warm = function () {
+    if (!nav) return;
+    var links = nav.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var u = internal(links[i]);
+      if (u && u.href !== location.href) fetchPage(u.href)['catch'](function () {});
+    }
+  };
+  if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 3000 });
+  else setTimeout(warm, 1200);
+})();
+</script>
+<!--/SCRIPT-->
+</body>
+</html>

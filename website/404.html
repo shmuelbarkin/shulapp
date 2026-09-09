@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Page not found — Manage My Shul</title>
+<meta name="description" content="That page could not be found.">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+
+<!--STYLE-->
+<style>
+/* Manage My Shul — an archive.
+   Printed hard and monochrome: true black on white, no accent colour, rules
+   with weight to them. Links earn their emphasis from weight and underline
+   rather than hue. Monospace is reserved for things that are literally
+   spreadsheet content. */
+
+/* Tell the browser both themes are supported so it paints the correct base
+   colour between navigations instead of flashing white. */
+:root {
+  color-scheme: light dark;
+  --paper: #ffffff;
+  --ink: #000000;
+  --muted: #454545;
+  --rule: #000000;
+  --rule-soft: #c9c9c9;
+  --wash: #eeeeee;
+  --notice-bg: #000000;
+  --notice-fg: #ffffff;
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --measure: 48rem;
+  --rail: 11rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0a0a0a;
+    --ink: #ffffff;
+    --muted: #adadad;
+    --rule: #ffffff;
+    --rule-soft: #3c3c3c;
+    --wash: #1b1b1b;
+    /* the notice is persistent and sticky, so it sits just off the page rather
+       than as a bright slab that would glare on every scroll */
+    --notice-bg: #161616;
+    --notice-fg: #ffffff;
+  }
+}
+
+/* Set pre-paint by the inline head script, so a dismissed notice never flashes. */
+.notice-dismissed .notice { display: none; }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Paint the canvas from the root, so there is no white frame between
+     documents before body styles apply. */
+  background: var(--paper);
+  /* Reserve the scrollbar always: without this, moving between a page that
+     scrolls and one that does not shifts the centred column sideways. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 1.0625rem/1.6 var(--serif);
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+/* ---------- Archive notice ---------- */
+
+.notice {
+  background: var(--notice-bg);
+  color: var(--notice-fg);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.notice[hidden] { display: none; }
+
+.notice__inner {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.notice p { margin: 0; flex: 1; }
+
+.notice a { color: inherit; font-weight: 700; text-underline-offset: 0.18em; }
+
+.notice__close {
+  flex: none;
+  align-self: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  font-size: 1.05rem;
+  line-height: 1;
+  padding: 0.2rem 0.35rem;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.notice__close:hover { opacity: 1; }
+
+.notice__close:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* ---------- Frame ---------- */
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* The notice and the menu pin together as one unit: these pages are long
+   documentation, and both the way back to the other sheets and the fact that
+   this is an archive should stay in view. Grouping them means they cannot
+   drift apart or overlap when the notice wraps onto two lines. */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--paper);
+}
+
+.nav {
+  background: var(--paper);
+  border-bottom: 2px solid var(--rule);
+}
+
+.nav__inner {
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.15rem;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding-bottom: 0.15rem;
+  border-bottom: 2px solid transparent;
+}
+
+.nav a:hover { color: var(--ink); }
+
+.nav a[aria-current="page"] {
+  color: var(--ink);
+  font-weight: 700;
+  border-bottom-color: var(--ink);
+}
+
+.nav a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+/* Anchored sections must clear the sticky menu. */
+[id] { scroll-margin-top: 6.5rem; }
+
+.masthead { padding: 2.5rem 0 0; }
+
+.masthead__title {
+  margin: 0;
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1;
+}
+
+.masthead__title a { color: inherit; text-decoration: none; }
+
+.masthead__title a:hover { text-decoration: underline; text-underline-offset: 0.14em; }
+
+.masthead__tagline {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* ---------- Successor ---------- */
+
+/* A ruled box rather than a solid fill: it still has to be the loudest thing
+   on the page, but a slab of black that size swamped everything under it. */
+.successor {
+  margin: 2.25rem 0 0;
+  padding: 1.7rem 1.6rem 1.8rem;
+  border: 3px solid var(--ink);
+}
+
+.successor__lead {
+  margin: 0;
+  font-size: 1.65rem;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.15;
+}
+
+.successor__body { margin: 1rem 0 0; }
+
+.successor p + p { margin-top: 0.85rem; }
+
+.cta {
+  display: inline-block;
+  margin-top: 1.4rem;
+  padding: 0.7rem 1.35rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cta:hover { text-decoration: underline; text-underline-offset: 0.22em; }
+
+.cta:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+
+/* ---------- Prose ---------- */
+
+main { padding-bottom: 1rem; }
+
+.page-title {
+  margin: 2.5rem 0 0.4rem;
+  font-size: 2.15rem;
+  font-weight: 700;
+  letter-spacing: -0.026em;
+  line-height: 1.1;
+}
+
+.page-intro { margin: 0; max-width: 36rem; color: var(--muted); font-size: 1.05rem; }
+
+/* Sections hang their heading in a left rail and rule off from the one above.
+   A stack of headings with rules underneath reads as a README; a spine and a
+   heavy separator reads as a document. */
+section {
+  display: grid;
+  grid-template-columns: var(--rail) 1fr;
+  gap: 0 2.25rem;
+  align-items: start;
+}
+
+section > * { grid-column: 2; min-width: 0; }
+
+.lede { max-width: 37rem; }
+
+section {
+  margin-top: 3.5rem;
+  padding-top: 1.5rem;
+  border-top: 3px solid var(--rule);
+}
+
+section > h2 {
+  grid-column: 1;
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+}
+
+section > *:first-of-type { margin-top: 0; }
+
+.section-note { margin: 0 0 0.9rem; color: var(--muted); }
+
+.signature { margin-top: 1.4rem; }
+
+/* Subsection heads sit in the wide column, so they must stay quieter than the
+   section head in the rail or the hierarchy reads backwards. */
+h3 {
+  margin: 1.7rem 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.002em;
+}
+
+p { margin: 0.8rem 0; }
+
+ul, ol { margin: 0.85rem 0; padding-left: 1.5rem; }
+
+li { margin: 0.32rem 0; padding-left: 0.15rem; }
+
+li::marker { color: var(--ink); font-weight: 700; }
+
+ol > li::marker { font-family: var(--mono); font-size: 0.8em; }
+
+li > ul, li > ol { margin: 0.32rem 0; }
+
+/* No accent colour, so a link is marked by weight and a rule under it. */
+a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.15em;
+}
+
+a:hover { text-decoration-thickness: 3px; }
+
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+strong { font-weight: 700; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.85em;
+  background: var(--wash);
+  padding: 0.12em 0.32em;
+  overflow-wrap: break-word;
+}
+
+.needs {
+  margin: 0.85rem 0;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+}
+
+.needs strong { color: var(--ink); font-weight: 700; }
+
+.callout {
+  margin: 1.15rem 0;
+  padding: 0.85rem 1.1rem;
+  background: var(--wash);
+  border-left: 4px solid var(--ink);
+  font-size: 0.95rem;
+}
+
+.callout p { margin: 0; }
+
+/* ---------- Foot ---------- */
+
+.foot {
+  margin-top: 3rem;
+  padding: 1.6rem 0 5.5rem;
+  border-top: 2px solid var(--rule);
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+.foot p { margin: 0.35rem 0; }
+
+.foot strong { color: var(--ink); }
+
+/* Below the rail's working width the spine collapses and headings sit inline. */
+@media (max-width: 46rem) {
+  section { display: block; }
+  section > h2 { margin-bottom: 0.8rem; font-size: 1.25rem; }
+}
+
+@media (max-width: 34rem) {
+  .masthead__title { font-size: 2.05rem; }
+  .page-title { font-size: 1.8rem; }
+  .successor { padding: 1.4rem 1.25rem 1.5rem; }
+  .successor__lead { font-size: 1.35rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+<!--/STYLE-->
+<script>
+/* Runs before first paint: if the notice was dismissed, hide it now rather than
+   letting it paint and then vanish when banner.js runs at end of body. */
+try { if (localStorage.getItem('mms-notice-dismissed') === '1') document.documentElement.classList.add('notice-dismissed'); } catch (e) {}
+</script>
+</head>
+<body>
+
+<div class="topbar">
+
+  <div class="notice">
+    <div class="notice__inner">
+      <p>These tools are archived and no longer maintained. Their successor is <a href="https://shulbase.com">ShulBase</a>.</p>
+      <button type="button" class="notice__close" aria-label="Dismiss this notice">&times;</button>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="Sections">
+    <div class="wrap nav__inner">
+        <a href="/">Home</a>
+        <a href="/zmanim/">Zmanim</a>
+        <a href="/pledges-receipts/">Pledges &amp; Receipts</a>
+        <a href="/member-database/">Member Database</a>
+        <a href="/technologies/">Technologies</a>
+        <a href="/terms/">Terms</a>
+    </div>
+  </nav>
+
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="masthead__title"><a href="/">Manage My Shul</a></p>
+    <p class="masthead__tagline">There is a better way</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <main>
+
+    <h1 class="page-title">Page not found</h1>
+    <p class="page-intro">The address you followed doesn&rsquo;t exist on this site.</p>
+
+    <section>
+      <h2>That page isn&rsquo;t here</h2>
+      <p>This site was rebuilt as a static archive, and a few old WordPress addresses no longer exist. Everything that survived is reachable from the menu above, or from the <a href="/">home page</a>.</p>
+      <p>Looking for the current product instead? That&rsquo;s <a href="https://shulbase.com">ShulBase</a>.</p>
+    </section>
+
+  </main>
+
+  <footer class="foot">
+    <p><strong>Manage My Shul</strong> &mdash; an archive. These tools are no longer maintained; their successor is <a href="https://shulbase.com">ShulBase</a>.</p>
+    <p>Free to use and adapt &mdash; see <a href="/terms/">Terms</a>. Source files on <a href="https://github.com/shmuelbarkin/shulapp">GitHub</a>. Contact <a href="mailto:sb@sbarkin.com">sb@sbarkin.com</a>.</p>
+  </footer>
+
+</div>
+
+<!--SCRIPT-->
+<script>
+(function () {
+  var KEY = 'mms-notice-dismissed';
+  var notice = document.querySelector('.notice');
+  if (!notice) return;
+
+  try {
+    if (localStorage.getItem(KEY) === '1') notice.hidden = true;
+  } catch (e) {
+    /* storage unavailable (private mode, blocked cookies) - leave it visible */
+  }
+
+  var close = notice.querySelector('.notice__close');
+  if (!close) return;
+
+  close.addEventListener('click', function () {
+    notice.hidden = true;
+    try {
+      localStorage.setItem(KEY, '1');
+    } catch (e) {
+      /* nothing to persist to; it returns on the next page load */
+    }
+  });
+})();
+
+/* Same-origin navigation without a document swap.
+ *
+ * Every click used to be a full document load: the browser tore down the page
+ * and rebuilt it, chrome and all, which is what read as a flicker. The notice,
+ * masthead, sticky menu and footer are identical on every page and live outside
+ * <main>, so only <main> has to change. Nothing else repaints.
+ *
+ * Progressive enhancement throughout: if anything here fails or is unsupported,
+ * the link is left alone and the browser navigates normally. */
+(function () {
+  if (!window.fetch || !window.history || !history.pushState || !window.DOMParser) return;
+
+  var main = document.querySelector('main');
+  var nav = document.querySelector('.nav');
+  if (!main) return;
+
+  var cache = new Map();
+  var LIMIT = 12;
+
+  /* Which document is currently rendered, ignoring the fragment. Chrome fires
+     popstate for same-document fragment navigation as well as for real history
+     traversal, so without this the handler would re-render <main> and reset the
+     scroll every time someone clicked an in-page anchor. */
+  var current = location.pathname + location.search;
+
+  function internal(a) {
+    if (!a || !a.href || a.hasAttribute('download')) return null;
+    if (a.target && a.target !== '_self') return null;
+    var u;
+    try { u = new URL(a.href, location.href); } catch (e) { return null; }
+    if (u.origin !== location.origin) return null;
+    // leave assets and anything that is not a page to the browser
+    var last = u.pathname.split('/').pop();
+    if (last && last.indexOf('.') !== -1 && !/\.html?$/i.test(last)) return null;
+    return u;
+  }
+
+  function fetchPage(url) {
+    if (cache.has(url)) return cache.get(url);
+    var p = fetch(url, { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    });
+    if (cache.size > LIMIT) cache.clear();
+    cache.set(url, p);
+    return p;
+  }
+
+  function markCurrent(pathname) {
+    if (!nav) return;
+    var links = nav.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var u = internal(links[i]);
+      if (u && u.pathname === pathname) links[i].setAttribute('aria-current', 'page');
+      else links[i].removeAttribute('aria-current');
+    }
+  }
+
+  function render(html, url, scroll) {
+    var doc = new DOMParser().parseFromString(html, 'text/html');
+    var fresh = doc.querySelector('main');
+    if (!fresh) { location.href = url; return; }
+
+    main.replaceWith(fresh);
+    main = fresh;
+    if (doc.title) document.title = doc.title;
+
+    var canonical = document.querySelector('link[rel=canonical]');
+    var freshCanonical = doc.querySelector('link[rel=canonical]');
+    if (canonical && freshCanonical) canonical.href = freshCanonical.href;
+
+    var target = new URL(url, location.href);
+    current = target.pathname + target.search;
+    markCurrent(target.pathname);
+    window.scrollTo(0, scroll || 0);
+
+    /* Move focus into the new content so keyboard and screen reader users are
+       not left on a link that no longer exists. */
+    main.setAttribute('tabindex', '-1');
+    main.focus({ preventScroll: true });
+  }
+
+  function go(url, push) {
+    fetchPage(url).then(function (html) {
+      if (push) {
+        history.replaceState({ y: window.scrollY }, '');
+        history.pushState({ y: 0 }, '', url);
+      }
+      render(html, url, 0);
+    })['catch'](function () { location.href = url; });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    var u = internal(a);
+    if (!u) return;
+    // in-page anchors stay with the browser
+    if (u.pathname === location.pathname && u.hash) return;
+    if (u.href === location.href) { e.preventDefault(); return; }
+    e.preventDefault();
+    go(u.href, true);
+  });
+
+  document.addEventListener('mouseover', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href]') : null;
+    var u = internal(a);
+    if (u && u.href !== location.href) fetchPage(u.href)['catch'](function () {});
+  });
+
+  window.addEventListener('popstate', function (e) {
+    // a fragment change on the page already shown: let the browser scroll
+    if (location.pathname + location.search === current) return;
+    var y = (e.state && e.state.y) || 0;
+    fetchPage(location.href).then(function (html) {
+      render(html, location.href, y);
+    })['catch'](function () { location.reload(); });
+  });
+
+  /* Warm the menu once the page is idle: six documents of about 20KB, so the
+     first click on any of them is already in memory. */
+  var warm = function () {
+    if (!nav) return;
+    var links = nav.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      var u = internal(links[i]);
+      if (u && u.href !== location.href) fetchPage(u.href)['catch'](function () {});
+    }
+  };
+  if (window.requestIdleCallback) requestIdleCallback(warm, { timeout: 3000 });
+  else setTimeout(warm, 1200);
+})();
+</script>
+<!--/SCRIPT-->
+</body>
+</html>

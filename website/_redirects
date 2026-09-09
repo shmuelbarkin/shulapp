@@ -1,0 +1,13 @@
+# Legacy WordPress paths, retired with the CMS.
+/home            /                 301
+/wp-admin/*      /                 301
+/wp-login.php    /                 301
+/xmlrpc.php      /                 301
+/feed/*          /                 301
+/comments/feed/* /                 301
+/wp-content/*    /                 301
+/wp-includes/*   /                 301
+# Note: _redirects cannot match query strings, so legacy ?p=<id> permalinks are
+# not routed here - they land on the homepage, which is the intended target
+# anyway. An earlier "/?p=:id" rule parsed as "/" and redirected the homepage
+# to itself.
